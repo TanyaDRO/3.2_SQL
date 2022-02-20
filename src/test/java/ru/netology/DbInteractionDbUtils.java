@@ -9,7 +9,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.netology.mode.User;
-
+import java.util.UUID;
 import java.sql.DriverManager;
 
 public class DbInteractionDbUtils {
@@ -18,17 +18,21 @@ public class DbInteractionDbUtils {
     void setUp() {
         var faker = new Faker();
         var runner = new QueryRunner();
-        var dataSQL = "INSERT INTO users(login, password) VALUES (?, ?);";
+        var deleteCards = "DELETE FROM cards WHERE TRUE";
+        var deleteUsers = "DELETE FROM users WHERE TRUE";
+        var dataSQL = "INSERT INTO users (id, login, password) VALUES (?, ?, ?);";
 
         try (
                 var conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/mydb", "mom", "pass"
+                        "jdbc:mysql://localhost:3306/mydb", "user", "pass"
                 );
 
         ) {
+            runner.execute(conn, deleteCards);
+            runner.execute(conn, deleteUsers);
             // обычная вставка
-            runner.update(conn, dataSQL, faker.name().username(), "pass");
-            runner.update(conn, dataSQL, faker.name().username(), "pass");
+            runner.update(conn, dataSQL, 1, faker.name().username(), "pass");
+            runner.update(conn, dataSQL, 2, faker.name().username(), "pass");
         }
     }
 
@@ -41,7 +45,7 @@ public class DbInteractionDbUtils {
 
         try (
                 var conn = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/mydb", "mom", "pass"
+                        "jdbc:mysql://localhost:3306/mydb", "user", "pass"
                 );
         ) {
           var count = runner.query(conn, countSQL, new ScalarHandler<>());
