@@ -27,4 +27,21 @@ public class DbInteractionDbUtils {
 
         return verificationCode;
     }
+
+    public static void CleanDB() {
+        var runner = new QueryRunner();
+
+        try (
+                var conn = DriverManager.getConnection(
+                        "jdbc:mysql://localhost:3306/mydb", "user", "pass"
+                );
+
+        ) {
+            runner.execute(conn, "DELETE FROM cards WHERE TRUE");
+            runner.execute(conn, "DELETE FROM auth_codes WHERE TRUE");
+            runner.execute(conn, "DELETE FROM users WHERE TRUE");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
